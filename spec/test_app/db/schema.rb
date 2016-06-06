@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160606100046) do
+ActiveRecord::Schema.define(version: 20160606175752) do
 
   create_table "dagraph_edges", force: :cascade do |t|
     t.integer  "dag_parent_id"
