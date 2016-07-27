@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160606175752) do
+ActiveRecord::Schema.define(version: 20160727082729) do
 
   create_table "dagraph_edges", force: :cascade do |t|
     t.integer  "dag_parent_id"
@@ -26,7 +26,21 @@ ActiveRecord::Schema.define(version: 20160606175752) do
 
   add_index "dagraph_edges", ["dag_child_type", "dag_child_id"], name: "index_dagraph_edges_on_dag_child_type_and_dag_child_id"
   add_index "dagraph_edges", ["dag_parent_type", "dag_parent_id"], name: "index_dagraph_edges_on_dag_parent_type_and_dag_parent_id"
-  add_index "dagraph_edges", ["weight_type", "weight_id"], name: "index_dagraph_edges_on_weight_type_and_weight_id"
+
+  create_table "dagraph_route_nodes", force: :cascade do |t|
+    t.integer "route_id",  null: false
+    t.integer "node_id"
+    t.string  "node_type"
+    t.integer "level"
+  end
+
+  add_index "dagraph_route_nodes", ["node_type", "node_id"], name: "index_dagraph_route_nodes_on_node_type_and_node_id"
+  add_index "dagraph_route_nodes", ["route_id"], name: "index_dagraph_route_nodes_on_route_id"
+
+  create_table "dagraph_routes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "units", force: :cascade do |t|
     t.string   "code"

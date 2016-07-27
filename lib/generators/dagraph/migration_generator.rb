@@ -11,7 +11,7 @@ module Dagraph
     include Rails::Generators::Migration 
 
     def create_migration_file 
-      migration_template "create_dagraph_edges.rb", "db/migrate/create_dagraph_edges.rb" 
+      migration_template "create_dagraph.rb", "db/migrate/create_dagraph.rb" 
     end 
 
     def self.next_migration_number(dirname) 
