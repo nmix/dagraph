@@ -13,22 +13,30 @@ module Dagraph
     end
 
     module LocalInstanceMethods
-      def add_child(node) 
-        raise SelfCyclicError.exception("Must not add node to itself") if node == self
-        Edge.create(dag_parent: self, dag_child: node)
-        route = Route.create
-        route.nodes.create(node: self, level: 0)
-        route.nodes.create(node: node, level: 1)
+      def add_parent(node) 
+        create_edge(node, self)
       end
 
-      def add_parent(node)
-        raise SelfCyclicError.exception("Must not add node to itself") if node == self
-        Edge.create(dag_parent: node, dag_child: self)
-        route = Route.create
-        route.nodes.create(node: node, level: 0)
-        route.nodes.create(node: self, level: 1)
+      def add_child(node)
+        create_edge(self, node)
+      end
+
+      def parents(edge_type)
+        parent_edges.where(dag_parent_type: edge_type).map{ |e| e.dag_parent }
+      end
+
+      def children
       end
     end
+
+    def create_edge(parent, child)
+      raise SelfCyclicError.exception("Must not add node to itself") if parent == child
+      Edge.create(dag_parent: parent, dag_child: child)
+      route = Route.create
+      route.nodes.create(node: parent, level: 0)
+      route.nodes.create(node: child, level: 1)
+    end
+
   end
 end
 ActiveRecord::Base.include(Dagraph::ActsAsDagraph)
