@@ -7,17 +7,7 @@ module Dagraph
 
     module ClassMethods 
       def acts_as_dagraph(options = {}) 
-
-        has_many :parent_edges,
-          as: :dag_child,
-          class_name:  "Dagraph::Edge",
-          dependent: :destroy
-
-        has_many :child_edges,
-          as: :dag_parent,
-          class_name:  "Dagraph::Edge",
-          dependent: :destroy
-
+        include Dagraph::Model
         include Dagraph::ActsAsDagraph::LocalInstanceMethods
       end
     end
