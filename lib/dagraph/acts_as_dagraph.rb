@@ -21,21 +21,43 @@ module Dagraph
         create_edge(self, node)
       end
 
-      def parents(parent_type = self.class.name)
+      def parents(args = {})
+        parent_type = args[:parent_type] || self.class.name
         parent_edges.where(dag_parent_type: parent_type).map{ |e| e.dag_parent }
       end
 
-      def children(child_type = self.class.name)
+      def children(args = {})
+        child_type = args[:child_type] || self.class.name
         child_edges.where(dag_child_type: child_type).map{ |e| e.dag_child }
+      end
+
+      def routes
+        route_nodes.select(:route_id).distinct
+      end
+
+      def isolated?
+        if parents.any? || children.any?
+          false
+        else
+          true
+        end
       end
     end
 
     def create_edge(parent, child)
       raise SelfCyclicError.exception("Must not add node to itself") if parent == child
+      if parent.isolated? && child.isolated?
+        # create a simple route 
+        route = Route.create
+        route.nodes.create(node: parent, level: 0)
+        route.nodes.create(node: child, level: 1)
+      elsif parent.children.count == 0 || child.routes.count < 2
+        # expand existing routes
+      else
+        # create new route(s)
+        
+      end
       Edge.create(dag_parent: parent, dag_child: child)
-      route = Route.create
-      route.nodes.create(node: parent, level: 0)
-      route.nodes.create(node: child, level: 1)
     end
 
   end
