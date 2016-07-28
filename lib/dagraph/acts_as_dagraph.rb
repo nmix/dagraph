@@ -21,11 +21,12 @@ module Dagraph
         create_edge(self, node)
       end
 
-      def parents(edge_type)
-        parent_edges.where(dag_parent_type: edge_type).map{ |e| e.dag_parent }
+      def parents(parent_type = self.class.name)
+        parent_edges.where(dag_parent_type: parent_type).map{ |e| e.dag_parent }
       end
 
-      def children
+      def children(child_type = self.class.name)
+        child_edges.where(dag_child_type: child_type).map{ |e| e.dag_child }
       end
     end
 
