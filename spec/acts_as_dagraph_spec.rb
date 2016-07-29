@@ -121,4 +121,10 @@ RSpec.describe "ActsAsDagraph" do
     end
   end
 
+  describe "#ancestors" do
+    it "has not ancestors for isolated node" do
+      expect(graph.count).to eq 12
+    end
+  end
+
 end

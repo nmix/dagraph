@@ -42,6 +42,11 @@ module Dagraph
           true
         end
       end
+
+      def ancestors(args = {})
+        ancestor_type = args[:ancestor_type] || self.class.name
+      end
+
     end
 
     def create_edge(parent, child)
