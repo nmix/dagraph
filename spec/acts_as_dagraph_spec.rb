@@ -5,6 +5,10 @@ RSpec.describe "ActsAsDagraph" do
   let(:another_unit) { create(:unit) }
   let(:edge) { create(:edge) }
 
+  before(:all) do
+    create_graph
+  end
+
   it "has a valid Unit factory" do
     expect(unit).to be_valid
   end
@@ -77,53 +81,44 @@ RSpec.describe "ActsAsDagraph" do
     end
   end
 
-  describe "#parents" do
-    before(:each) do
-      create_list(:edge, 2, dag_child: unit)
+  describe "#isolated?" do
+    it "creates isolated node" do
+      expect(unit.isolated?).to be true
     end
 
-    it "has 2 parents" do
-      expect(unit.parents.count).to eq 2
+    it "is not isolated in graph" do
+      graph_nodes.each do |node|
+        expect(node.isolated?).to be false
+      end
+    end
+  end
+
+  describe "#parents" do
+    it "determines the amount of all parents for graph nodes" do
+      [[7,0], [5,0], [3,0], [11,2], [8,2], [2,1], [9,2], [10,2]].each do |code, count|
+        expect(node(code).parents.count).to eq count
+      end
     end
   end
 
   describe "#children" do 
-    before(:each) do
-      create_list(:edge, 2, dag_parent: unit)
-    end
-
-    it "has 2 children" do
-      expect(unit.children.count).to eq 2
+    it "determines the amount of all children for graph nodes" do
+      [[7,2], [5,1], [3,2], [11,3], [8,1], [2,0], [9,0], [10,0]].each do |code, count|
+        expect(node(code).children.count).to eq count
+      end
     end
   end
-
 
   describe "#routes" do
-    let(:parent_unit) { create(:edge_with_route).dag_parent }
-    let(:child_unit) { create(:edge_with_route).dag_child }
-
-    it "has minimum one route for parent_unit on the edge" do
-      expect(parent_unit.routes.count).to be > 0
-    end
-
-    it "has minimum one route for child_unit on the edge" do
-      expect(child_unit.routes.count).to be > 0
-    end
-  end
-
-  describe "#isolated?" do
-    it "creates isolated" do
-      expect(unit.isolated?).to be true
-    end
-
-    it "is not isolated on edge" do
-      expect(create(:edge_with_route).dag_parent.isolated?).to be false
+    it "determines the amount of routes for graph nodes" do
+      [[7,4], [5,3], [3,2], [11,6], [8,2], [2,2], [9,4], [10,3]].each do |code, count|
+        expect(node(code).routes.count).to eq count
+      end
     end
   end
 
   describe "#ancestors" do
     it "has not ancestors for isolated node" do
-      expect(graph.count).to eq 12
     end
   end
 
