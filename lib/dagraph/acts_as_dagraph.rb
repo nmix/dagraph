@@ -31,9 +31,13 @@ module Dagraph
         child_edges.where(dag_child_type: child_type).map{ |e| e.dag_child }
       end
 
-      def routes
-        route_nodes.select(:route_id).distinct
+      def routing
+        routes.map{ |r| [r.id, r.route_nodes.nodes] }.to_h
       end
+      # def routes
+      #   route_nodes.select(:route_id).distinct
+      #   route_nodes.select(:route_id).map{ |item| [item[:route_id], Dagraph::RouteNode.on_route(item[:route_id]) }.to_h
+      # end
 
       def isolated?
         if parents.any? || children.any?
@@ -45,6 +49,7 @@ module Dagraph
 
       def ancestors(args = {})
         ancestor_type = args[:ancestor_type] || self.class.name
+        
       end
 
     end
@@ -54,8 +59,8 @@ module Dagraph
       if parent.isolated? && child.isolated?
         # create a simple route 
         route = Route.create
-        route.nodes.create(node: parent, level: 0)
-        route.nodes.create(node: child, level: 1)
+        route.route_nodes.create(node: parent, level: 0)
+        route.route_nodes.create(node: child, level: 1)
       elsif parent.children.count == 0 || child.routes.count < 2
         # expand existing routes
       else

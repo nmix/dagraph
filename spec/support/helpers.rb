@@ -19,17 +19,20 @@ module ActsAsDagraphHelpers
       9 => [3, 10] }
     nodes.each do |route_index, route_nodes| 
       route_nodes.each_with_index do |unit_label, level|
-        routes[route_index].nodes.create(node: node(unit_label), level: level)
+        routes[route_index].route_nodes.create(node: node(unit_label), level: level)
       end
     end
   end
 
   def node(label)
-    label = label.to_s if label.is_a? Fixnum
     Unit.find_by(name: "graph", code: label)
   end
 
-  def graph_nodes
+  def nodes(*codes)
+    Unit.where(name: "graph", code: codes.to_a).to_a
+  end
+
+  def all_graph_nodes
     Unit.where(name: "graph")
   end
 

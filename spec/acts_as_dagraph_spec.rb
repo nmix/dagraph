@@ -87,7 +87,7 @@ RSpec.describe "ActsAsDagraph" do
     end
 
     it "is not isolated in graph" do
-      graph_nodes.each do |node|
+      all_graph_nodes.each do |node|
         expect(node.isolated?).to be false
       end
     end
@@ -114,6 +114,22 @@ RSpec.describe "ActsAsDagraph" do
       [[7,4], [5,3], [3,2], [11,6], [8,2], [2,2], [9,4], [10,3]].each do |code, count|
         expect(node(code).routes.count).to eq count
       end
+    end
+  end
+
+  describe "#routing" do
+    it "has empty routing for isolated node" do
+      expect(unit.routing.count).to eq 0
+    end
+
+    it "determines the amount of routes for graph nodes" do
+      [[7,4], [5,3], [3,2], [11,6], [8,2], [2,2], [9,4], [10,3]].each do |code, count|
+        expect(node(code).routing.count).to eq count
+      end
+    end
+
+    it "contains exactly nodes" do
+      expect(node(7).routing.values).to include(nodes(7, 11, 2))
     end
   end
 

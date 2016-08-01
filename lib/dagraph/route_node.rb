@@ -7,5 +7,9 @@ module Dagraph
     belongs_to :node, polymorphic: true
     belongs_to :route, class_name:  "Dagraph::Route"
 
+    def self.nodes
+      all.map{ |n| n.node }
+    end
+
   end
 end
