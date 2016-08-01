@@ -129,7 +129,26 @@ RSpec.describe "ActsAsDagraph" do
     end
 
     it "contains exactly nodes" do
-      expect(node(7).routing.values).to include(nodes(7, 11, 2))
+      [
+        [7, [[7,11,2], [7,11,9], [7,11,10], [7,8,9]]],
+        [5, [[5,11,2], [5,11,9], [5,11,10]]],
+        [3, [[3,8,9], [3,10]]],
+        [11, [[7,11,2], [7,11,9], [7,11,10], [5,11,2], [5,11,9], [5,11,10]]],
+        [8, [[7,8,9], [3,8,9]]],
+        [2, [[7,11,2], [5,11,2]]],
+        [9, [[7,11,9], [5,11,9], [7,8,9], [3,8,9]]],
+        [10, [[7,11,10], [5,11,10], [3,10]]]
+      ].each do |code, routes|
+        expect(node(code).routing.values).to contain_exactly(*routes.map{|codes| nodes(*codes)})
+      end
+    end
+
+    it "orders nodes by level" do
+      all_graph_nodes.each do |node|
+        node.routing.keys.each do |route_id|
+          expect(Dagraph::Route.find(route_id).route_nodes).to eq(Dagraph::RouteNode.where(route_id: route_id).order(:level))
+        end
+      end
     end
   end
 

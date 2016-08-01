@@ -25,15 +25,15 @@ module ActsAsDagraphHelpers
   end
 
   def node(label)
-    Unit.find_by(name: "graph", code: label)
+    Unit.find_by(code: label)
   end
 
   def nodes(*codes)
-    Unit.where(name: "graph", code: codes.to_a).to_a
+    Unit.where(code: codes.to_a).to_a
   end
 
   def all_graph_nodes
-    Unit.where(name: "graph")
+    Unit.select(:id, :name, :code).where(name: "graph")
   end
 
 end

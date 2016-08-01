@@ -34,10 +34,6 @@ module Dagraph
       def routing
         routes.map{ |r| [r.id, r.route_nodes.nodes] }.to_h
       end
-      # def routes
-      #   route_nodes.select(:route_id).distinct
-      #   route_nodes.select(:route_id).map{ |item| [item[:route_id], Dagraph::RouteNode.on_route(item[:route_id]) }.to_h
-      # end
 
       def isolated?
         if parents.any? || children.any?
@@ -49,7 +45,6 @@ module Dagraph
 
       def ancestors(args = {})
         ancestor_type = args[:ancestor_type] || self.class.name
-        
       end
 
     end
