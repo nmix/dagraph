@@ -153,7 +153,7 @@ RSpec.describe "ActsAsDagraph" do
   end
 
   describe "#ancestors" do
-    it "has not ancestors for isolated node" do
+    it "has no ancestors for isolated node" do
       expect(unit.ancestors.count).to eq 0
     end
 
@@ -172,6 +172,30 @@ RSpec.describe "ActsAsDagraph" do
         [10, [[7,11], [5,11], [3]]]
       ].each do |code, routes|
         expect(node(code).ancestors).to contain_exactly(*routes.map{|codes| nodes(*codes)})
+      end
+    end
+  end
+
+  describe "#descendants" do
+    it "has no descendants for isolated node" do
+      expect(unit.descendants.count).to eq 0
+    end
+
+    it "determines the amount of descendants" do
+      [[7,4], [5,3], [3,2], [11,3], [8,1], [2,0], [9,0], [10,0]].each do |code, count|
+        expect(node(code).descendants.count).to eq count
+      end
+    end
+
+    it "contains exactly nodes" do
+      [
+        [7, [[11,2], [11,9], [11,10], [8,9]]],
+        [5, [[11,2], [11,9], [11,10]]],
+        [3, [[8,9], [10]]],
+        [11, [[2], [9], [10]]],
+        [8, [[9]]]
+      ].each do |code, routes|
+        expect(node(code).descendants).to contain_exactly(*routes.map{|codes| nodes(*codes)})
       end
     end
   end
