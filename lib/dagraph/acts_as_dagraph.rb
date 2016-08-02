@@ -45,7 +45,12 @@ module Dagraph
 
       def ancestors(args = {})
         ancestor_type = args[:ancestor_type] || self.class.name
+        anc = route_nodes.where('level > 0').map do |route_node| 
+          route_node.route.route_nodes.where('node_type = ? AND level < ?', ancestor_type, route_node.level).nodes
+        end
+        anc.uniq
       end
+
 
     end
 

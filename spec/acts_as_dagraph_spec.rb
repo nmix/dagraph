@@ -154,6 +154,25 @@ RSpec.describe "ActsAsDagraph" do
 
   describe "#ancestors" do
     it "has not ancestors for isolated node" do
+      expect(unit.ancestors.count).to eq 0
+    end
+
+    it "determines the amount of ancestors" do
+      [[7,0], [5,0], [3,0], [11,2], [8,2], [2,2], [9,4], [10,3]].each do |code, count|
+        expect(node(code).ancestors.count).to eq count
+      end
+    end
+
+    it "contains exactly nodes" do
+      [
+        [11, [[7], [5]]],
+        [8, [[7], [3]]],
+        [2, [[7,11], [5,11]]],
+        [9, [[7,11], [5,11], [7,8], [3,8]]],
+        [10, [[7,11], [5,11], [3]]]
+      ].each do |code, routes|
+        expect(node(code).ancestors).to contain_exactly(*routes.map{|codes| nodes(*codes)})
+      end
     end
   end
 
