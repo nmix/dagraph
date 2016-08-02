@@ -67,6 +67,12 @@ RSpec.describe "ActsAsDagraph" do
       it "raises exception if add self node" do
         expect { unit.add_child(unit) }.to raise_error(SelfCyclicError)
       end
+
+      it "does not create any route" do
+      end
+
+      it "determines the amount of new routes for isolated child" do
+      end
     end
   end
 

@@ -73,7 +73,6 @@ module Dagraph
         # expand existing routes
       else
         # create new route(s)
-        
       end
       Edge.create(dag_parent: parent, dag_child: child)
     end
