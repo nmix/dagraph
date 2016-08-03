@@ -7,22 +7,28 @@ module ActsAsDagraphHelpers
     [[7, 11], [7, 8], [11, 9], [8, 9], [11, 10], [5, 11], [11, 2], [3, 8], [3, 10]].each do |parent, child|
       create(:edge, dag_parent: node(index + parent), dag_child: node(index + child))
     end
-    routes = create_list(:route, 10)
+    routes = create_list(:route, 9)
     nodes =  { 
-      1 => [7, 11, 9], 
-      2 => [7, 8, 9], 
-      3 => [7, 11, 10], 
-      4 => [5, 11, 9], 
-      5 => [5, 11, 10],
-      6 => [7, 11, 2],
-      7 => [5, 11, 2],
-      8 => [3, 8, 9],
-      9 => [3, 10] }
+      0 => [7, 11, 9], 
+      1 => [7, 8, 9], 
+      2 => [7, 11, 10], 
+      3 => [5, 11, 9], 
+      4 => [5, 11, 10],
+      5 => [7, 11, 2],
+      6 => [5, 11, 2],
+      7 => [3, 8, 9],
+      8 => [3, 10] }
     nodes.each do |route_index, route_nodes| 
       route_nodes.each_with_index do |unit_label, level|
         routes[route_index].route_nodes.create(node: node(index + unit_label), level: level)
       end
     end
+  end
+
+  def destroy_all_graphs
+    Dagraph::Edge.destroy_all
+    Dagraph::Route.destroy_all
+    Unit.destroy_all
   end
 
   def node(label)
