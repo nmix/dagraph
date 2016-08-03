@@ -343,7 +343,7 @@ RSpec.describe "ActsAsDagraph" do
       end
     end
 
-    it "destroy Route objects" do
+    it "changes Route objects" do
       expect {
         node(311).remove_child(node(309))
       }.to change{ Dagraph::Route.count }.by -2

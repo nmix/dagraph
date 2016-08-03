@@ -1,4 +1,4 @@
-module Dagraph
+ module Dagraph
   module ActsAsDagraph
     extend ActiveSupport::Concern
 
@@ -137,8 +137,29 @@ module Dagraph
       edge = Edge.find_by(dag_parent: parent, dag_child: child)
       return edge unless edge
       common_routes = parent.routes.ids & child.routes.ids
-      # Route.destroy(common_routes)
-      edge.destroy
+      common_routes.each do |route_id|
+        nodes = RouteNode.where(route_id: route_id).nodes
+        separator = nodes.index(parent)
+        hi_array = nodes[0..separator]
+        low_array = nodes[separator+1..-1]
+        # --- remove old route
+        Route.destroy(route_id)
+        # --- create new routes
+        if hi_array.size > 1 && parent.leaf?
+          route = Route.create
+          hi_array.each_with_index do |node, index| 
+            route.route_nodes.create(node: node, level: index)
+          end
+        end
+        if low_array.size > 1 && child.root?
+          route = Route.create
+          low_array.each_with_index do |node, index|
+            route.route_nodes.create(node: node, level: index)
+          end
+        end
+        # --- destroy edge
+        edge.destroy
+      end
     end
 
   end
