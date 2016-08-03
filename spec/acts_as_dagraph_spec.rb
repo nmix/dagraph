@@ -9,10 +9,6 @@ RSpec.describe "ActsAsDagraph" do
     create_graph
   end
 
-  # after(:each) do
-  #   # destroy_all_graphs
-  # end
-
   it "has a valid Unit factory" do
     expect(unit).to be_valid
   end
@@ -103,8 +99,6 @@ RSpec.describe "ActsAsDagraph" do
           }.to_not change{ Dagraph::Route.count }
         end
       end
-
-
     end
   end
 
@@ -165,7 +159,6 @@ RSpec.describe "ActsAsDagraph" do
           }.to_not change{ Dagraph::Route.count }
         end
       end
-
     end
   end
 
@@ -334,6 +327,36 @@ RSpec.describe "ActsAsDagraph" do
         end
       end
     end
+  end
+
+  describe "#remove_child" do
+    before(:each) do
+      create_graph(index: 300)
+      @edges = [[7,11], [5,11], [7,8], [3,8], [11,2], [11,9], [8,9], [11,10], [3,10]]
+    end
+
+    it "destroy an Edge object" do
+      @edges.each do |parent, child|
+        expect {
+          node(300+parent).remove_child(node(300+child))
+        }.to change{ Dagraph::Edge.count }.by -1
+      end
+    end
+
+    it "destroy Route objects" do
+      expect {
+        node(311).remove_child(node(309))
+      }.to change{ Dagraph::Route.count }.by -2
+    end
+  end
+
+  describe "#remove_children" do
+  end
+
+  describe "#remove_parent" do
+  end
+
+  describe "#remove_parents" do
   end
 
 end

@@ -22,8 +22,16 @@ module Dagraph
         create_edge(node, self)
       end
 
+      def remove_parent(node)
+        remove_edge(node, self)
+      end
+
       def add_child(node)
         create_edge(self, node)
+      end
+
+      def remove_child(node)
+        remove_edge(self, node)
       end
 
       def parents(args = {})
@@ -123,6 +131,14 @@ module Dagraph
         end
       end
       Edge.create(dag_parent: parent, dag_child: child)
+    end
+
+    def remove_edge(parent, child)
+      edge = Edge.find_by(dag_parent: parent, dag_child: child)
+      return edge unless edge
+      common_routes = parent.routes.ids & child.routes.ids
+      # Route.destroy(common_routes)
+      edge.destroy
     end
 
   end
