@@ -91,7 +91,9 @@ module Dagraph
     end
 
     def create_edge(parent, child)
-      raise SelfCyclicError.exception("Must not add node to itself") if parent == child
+      raise SelfCyclicError if parent == child
+      raise CyclicError if parent.ancestors.flatten.uniq.include? child
+
       if parent.isolated? && child.isolated?
         # create a simple route 
         route = Route.create

@@ -53,12 +53,26 @@ RSpec.describe "ActsAsDagraph" do
       expect { unit.add_child(unit) }.to raise_error(SelfCyclicError)
     end
 
+    it "raises exception if add ancestor node" do
+      [
+        [11, [7, 5]],
+        [8, [7, 3]],
+        [2, [7, 5, 11]],
+        [9, [7, 5, 3, 11, 8]],
+        [10, [7, 5, 3, 11]],
+      ].each do |code, parent_codes|
+        parent_codes.each do |parent_code|
+          expect { node(code).add_child(node(parent_code)) }.to raise_error(CyclicError)
+        end
+      end
+    end
+
     context "when graph is arbitrary" do
       before(:all) do
         create_graph(index: 100)
       end
 
-      it "determines the amount of new routes" do
+      it "creates new routes for non-isolated nodes" do
         [
           [2, 105, 1],
           [2, 107, 4],
@@ -71,6 +85,26 @@ RSpec.describe "ActsAsDagraph" do
           }.to change{ Dagraph::Route.count }.by(new_routes_count)
         end
       end
+
+      it "creates new routes for isolated child" do
+        [7, 5, 3, 11, 8].each do |code|
+          anc_count = node(code).ancestors.count
+          anc_count = 1 if anc_count == 0
+          expect{
+            node(code).add_child(create(:unit)) 
+            }.to change{ Dagraph::Route.count }.by(anc_count)
+        end
+      end
+
+      it "does not create routes for isolated child" do
+        [2, 9, 10].each do |code|
+          expect {
+            node(code).add_child(create(:unit))
+          }.to_not change{ Dagraph::Route.count }
+        end
+      end
+
+
     end
   end
 
@@ -82,12 +116,25 @@ RSpec.describe "ActsAsDagraph" do
       expect { unit.add_parent(unit) }.to raise_error(SelfCyclicError)
     end
 
+    it "raises exception if add descendant node" do
+      [
+        [7, [11,8,2,9,10]],
+        [5, [11,2,9,10]],
+        [11, [2,9,10]],
+        [8, [9]],
+      ].each do |code, child_codes|
+        child_codes.each do |child_code|
+          expect{ node(code).add_parent(node(child_code)) }.to raise_error(CyclicError)
+        end
+      end
+    end
+
     context "when graph is arbitrary" do
       before(:all) do
         create_graph(index: 200)
       end
 
-      it "determines the amount of new routes" do
+      it "creates new routes for non-isolated nodes" do
         [
           [2, 205, 1],
           [2, 207, 4],
@@ -100,6 +147,25 @@ RSpec.describe "ActsAsDagraph" do
           }.to change{ Dagraph::Route.count }.by(new_routes_count)
         end
       end
+
+      it "creates new routes for isolated parent" do
+        [11, 8, 2, 9, 10].each do |code|
+          desc_count = node(code).descendants.count
+          desc_count = 1 if desc_count == 0
+          expect{
+            node(code).add_parent(create(:unit)) 
+            }.to change{ Dagraph::Route.count }.by(desc_count)
+        end
+      end
+
+      it "does not create routes for isolated parent" do
+        [7, 5, 3].each do |code|
+          expect {
+            node(code).add_parent(create(:unit))
+          }.to_not change{ Dagraph::Route.count }
+        end
+      end
+
     end
   end
 
