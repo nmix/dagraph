@@ -11,5 +11,9 @@ module Dagraph
     def self.parents
       all.map{ |e| e.dag_parent }
     end
+
+    def self.children
+      all.map{ |e| e.dag_child }
+    end
   end
 end

@@ -10,11 +10,19 @@
         include Dagraph::Model
 
         def roots(args = {})
-          parent_edges = Dagraph::Edge.find_by_sql("
+          parent_edges = Edge.find_by_sql("
             SELECT DISTINCT id 
             FROM dagraph_edges 
             WHERE dag_parent_id NOT IN (SELECT dag_child_id FROM dagraph_edges)")
           Edge.where(id: parent_edges).parents.uniq
+        end
+
+        def leafs(args = {})
+          child_edges = Edge.find_by_sql("
+            SELECT DISTINCT id
+            FROM dagraph_edges
+            WHERE dag_child_id NOT IN (SELECT dag_parent_id FROM dagraph_edges)")
+          Edge.where(id: child_edges).children.uniq
         end
 
         include Dagraph::ActsAsDagraph::LocalInstanceMethods

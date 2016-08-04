@@ -463,11 +463,23 @@ RSpec.describe "ActsAsDagraph" do
     it "contains top nodes" do
       expect(Unit.roots).to include(*nodes(7, 5, 3))
     end
+
+    it "does not contain not top nodes" do 
+      nodes(11, 8, 2, 9, 10).each do |node|
+        expect(Unit.roots).not_to include(node)
+      end
+    end
   end
 
   describe ".leafs" do
     it "contains bottom nodes" do
-      
+      expect(Unit.leafs).to include(*nodes(2, 9, 10))
+    end
+
+    it "does not contain not bottom nodes" do
+      nodes(7, 5, 3, 11, 8).each do |node|
+        expect(Unit.leafs).not_to include(node)
+      end
     end
   end
 end
