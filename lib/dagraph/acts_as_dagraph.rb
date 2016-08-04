@@ -9,8 +9,12 @@
       def acts_as_dagraph(options = {}) 
         include Dagraph::Model
 
-        def report
-          "routes: #{Route.all.size},   route_nodes: #{RouteNode.all.size},   units: #{Unit.all.size}"
+        def roots(args = {})
+          parent_edges = Dagraph::Edge.find_by_sql("
+            SELECT DISTINCT id 
+            FROM dagraph_edges 
+            WHERE dag_parent_id NOT IN (SELECT dag_child_id FROM dagraph_edges)")
+          Edge.where(id: parent_edges).parents.uniq
         end
 
         include Dagraph::ActsAsDagraph::LocalInstanceMethods
@@ -102,6 +106,14 @@
 
       def self_and_descendants(args = {})
         descendants(args).map{ |item| [self] + item }
+      end
+
+      def roots(args = {})
+        ancestors(args).map{ |anc_route| anc_route.first }.uniq
+      end
+
+      def leafs(args = {})
+        descendants(args).map { |desc_route| desc_route.last }.uniq
       end
 
     end

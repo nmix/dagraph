@@ -7,5 +7,9 @@ module Dagraph
     belongs_to :dag_parent, polymorphic: true
     belongs_to :dag_child, polymorphic: true
     belongs_to :weight, polymorphic: true
+
+    def self.parents
+      all.map{ |e| e.dag_parent }
+    end
   end
 end

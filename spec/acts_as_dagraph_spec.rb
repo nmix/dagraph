@@ -162,6 +162,102 @@ RSpec.describe "ActsAsDagraph" do
     end
   end
 
+  describe "#remove_child" do
+    before(:each) do
+      create_graph(index: 300)
+      @edges = [
+        [7,11, 3],  [5,11, 0], [7,8,1], [3,8,0],
+        [11,2,1], [11,9,1], [8,9,1], [11,10,1], [3,10, 1]
+      ]
+    end
+
+    it "destroy an Edge object" do
+      @edges.each do |parent, child|
+        expect {
+          node(300+parent).remove_child(node(300+child))
+        }.to change{ Dagraph::Edge.count }.by -1
+      end
+    end
+
+    it "changes Route objects" do
+      @edges.each do |parent, child, route_diff|
+        expect {
+          node(300 + parent).remove_child(node(300 + child))
+        }.to change{ Dagraph::Route.count }.by -(route_diff)
+      end
+    end
+  end
+
+  describe "#remove_children" do
+    before(:each) do
+      create_graph(index: 300)
+    end
+
+    it "destroy Edge objects" do
+      [[7,2],[5,1],[3,2],[11,3],[8,1],[2,0],[9,0],[10,0]].each do |code, edge_diff|
+        expect {
+          node(300 + code).remove_children
+        }.to change{ Dagraph::Edge.count }.by -(edge_diff)
+      end
+    end
+
+    it "changes Route objects" do
+      [[7,4], [5,0],[3,1],[11,3],[8,1],[2,0],[9,0],[10,0]].each do |code, route_diff|
+        expect {
+          node(300 + code).remove_children
+        }.to change{ Dagraph::Route.count }.by -(route_diff)
+      end
+    end
+  end
+
+  describe "#remove_parent" do
+    before(:each) do
+      create_graph(index: 300)
+      @edges = [
+        [2,11,2], [9,11,2], [9,8,0], [10,11,0], [10,3,1], 
+        [11,7,1], [11,5,1], [8,7,1], [8,3,1]
+      ]
+    end
+
+    it "destroy an Edge object" do
+      @edges.each do |child, parent|
+        expect {
+          node(300+child).remove_parent(node(300+parent))
+        }.to change{ Dagraph::Edge.count }.by -1
+      end
+    end
+
+    it "changes Route objects" do
+      @edges.each do |child, parent, route_diff|
+        expect {
+          node(300+child).remove_parent(node(300+parent))
+        }.to change{ Dagraph::Route.count }.by -(route_diff)
+      end
+    end
+  end
+
+  describe "#remove_parents" do
+    before(:each) do
+      create_graph(index: 300)
+    end
+
+    it "destroy Edge objects" do
+      [[2,1],[9,2],[10,2],[11,2],[8,2],[7,0],[5,0],[3,0]].each do |code, edge_diff|
+        expect {
+          node(300 + code).remove_parents
+        }.to change{ Dagraph::Edge.count }.by -(edge_diff)
+      end
+    end
+
+    it "changes Route objects" do
+      [[11,3],[8,1],[9,2],[2,1]].each do |code, route_diff|
+        expect {
+          node(300 + code).remove_parents
+        }.to change{ Dagraph::Route.count }.by -(route_diff)
+      end
+    end
+  end
+
   describe "#isolated?" do
     it "creates isolated node" do
       expect(unit.isolated?).to be true
@@ -329,100 +425,49 @@ RSpec.describe "ActsAsDagraph" do
     end
   end
 
-  describe "#remove_child" do
-    before(:each) do
-      create_graph(index: 300)
-      @edges = [
-        [7,11, 3],  [5,11, 0], [7,8,1], [3,8,0],
-        [11,2,1], [11,9,1], [8,9,1], [11,10,1], [3,10, 1]
-      ]
-    end
-
-    it "destroy an Edge object" do
-      @edges.each do |parent, child|
-        expect {
-          node(300+parent).remove_child(node(300+child))
-        }.to change{ Dagraph::Edge.count }.by -1
-      end
-    end
-
-    it "changes Route objects" do
-      @edges.each do |parent, child, route_diff|
-        expect {
-          node(300 + parent).remove_child(node(300 + child))
-        }.to change{ Dagraph::Route.count }.by -(route_diff)
+  describe "#roots" do
+    it "returns top nodes for graph routes" do
+      [
+        [2, [7,5]],
+        [9, [7,5,3]],
+        [10, [7,5,3]],
+        [11, [7,5]],
+        [8, [7,3]],
+        [7, []], 
+        [5, []],
+        [3, []]
+      ].each do |code, root_codes|
+        expect(node(code).roots).to contain_exactly(*nodes(*root_codes))
       end
     end
   end
 
-  describe "#remove_children" do
-    before(:each) do
-      create_graph(index: 300)
-    end
-
-    it "destroy Edge objects" do
-      [[7,2],[5,1],[3,2],[11,3],[8,1],[2,0],[9,0],[10,0]].each do |code, edge_diff|
-        expect {
-          node(300 + code).remove_children
-        }.to change{ Dagraph::Edge.count }.by -(edge_diff)
-      end
-    end
-
-    it "changes Route objects" do
-      [[7,4], [5,0],[3,1],[11,3],[8,1],[2,0],[9,0],[10,0]].each do |code, route_diff|
-        expect {
-          node(300 + code).remove_children
-        }.to change{ Dagraph::Route.count }.by -(route_diff)
-      end
+  describe "#leafs" do
+    it "returns bottom nodes for graph routes" do
+       [
+        [7, [2,9,10]],
+        [5, [2,9,10]],
+        [3, [9,10]],
+        [11, [2,9,10]],
+        [8, [9]],
+        [2, []],
+        [9, []],
+        [10, []]
+       ].each do |code, leaf_codes|
+        expect(node(code).leafs).to contain_exactly(*nodes(*leaf_codes))
+       end
     end
   end
 
-  describe "#remove_parent" do
-    before(:each) do
-      create_graph(index: 300)
-      @edges = [
-        [2,11,2], [9,11,2], [9,8,0], [10,11,0], [10,3,1], 
-        [11,7,1], [11,5,1], [8,7,1], [8,3,1]
-      ]
-    end
-
-    it "destroy an Edge object" do
-      @edges.each do |child, parent|
-        expect {
-          node(300+child).remove_parent(node(300+parent))
-        }.to change{ Dagraph::Edge.count }.by -1
-      end
-    end
-
-    it "changes Route objects" do
-      @edges.each do |child, parent, route_diff|
-        expect {
-          node(300+child).remove_parent(node(300+parent))
-        }.to change{ Dagraph::Route.count }.by -(route_diff)
-      end
+  describe ".roots" do
+    it "contains top nodes" do
+      expect(Unit.roots).to include(*nodes(7, 5, 3))
     end
   end
 
-  describe "#remove_parents" do
-    before(:each) do
-      create_graph(index: 300)
-    end
-
-    it "destroy Edge objects" do
-      [[2,1],[9,2],[10,2],[11,2],[8,2],[7,0],[5,0],[3,0]].each do |code, edge_diff|
-        expect {
-          node(300 + code).remove_parents
-        }.to change{ Dagraph::Edge.count }.by -(edge_diff)
-      end
-    end
-
-    it "changes Route objects" do
-      [[11,3],[8,1],[9,2],[2,1]].each do |code, route_diff|
-        expect {
-          node(300 + code).remove_parents
-        }.to change{ Dagraph::Route.count }.by -(route_diff)
-      end
+  describe ".leafs" do
+    it "contains bottom nodes" do
+      
     end
   end
-
 end
