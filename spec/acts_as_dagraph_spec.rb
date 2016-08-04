@@ -378,9 +378,51 @@ RSpec.describe "ActsAsDagraph" do
   end
 
   describe "#remove_parent" do
+    before(:each) do
+      create_graph(index: 300)
+      @edges = [
+        [2,11,2], [9,11,2], [9,8,0], [10,11,0], [10,3,1], 
+        [11,7,1], [11,5,1], [8,7,1], [8,3,1]
+      ]
+    end
+
+    it "destroy an Edge object" do
+      @edges.each do |child, parent|
+        expect {
+          node(300+child).remove_parent(node(300+parent))
+        }.to change{ Dagraph::Edge.count }.by -1
+      end
+    end
+
+    it "changes Route objects" do
+      @edges.each do |child, parent, route_diff|
+        expect {
+          node(300+child).remove_parent(node(300+parent))
+        }.to change{ Dagraph::Route.count }.by -(route_diff)
+      end
+    end
   end
 
   describe "#remove_parents" do
+    before(:each) do
+      create_graph(index: 300)
+    end
+
+    it "destroy Edge objects" do
+      [[2,1],[9,2],[10,2],[11,2],[8,2],[7,0],[5,0],[3,0]].each do |code, edge_diff|
+        expect {
+          node(300 + code).remove_parents
+        }.to change{ Dagraph::Edge.count }.by -(edge_diff)
+      end
+    end
+
+    it "changes Route objects" do
+      [[11,3],[8,1],[9,2],[2,1]].each do |code, route_diff|
+        expect {
+          node(300 + code).remove_parents
+        }.to change{ Dagraph::Route.count }.by -(route_diff)
+      end
+    end
   end
 
 end

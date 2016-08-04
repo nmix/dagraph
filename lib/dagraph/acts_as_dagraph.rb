@@ -26,6 +26,10 @@
         remove_edge(node, self)
       end
 
+      def remove_parents(args = {})
+        parents(args).each { |parent| remove_edge(parent, self) }
+      end
+
       def add_child(node)
         create_edge(self, node)
       end
