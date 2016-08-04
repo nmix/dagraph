@@ -34,6 +34,10 @@
         remove_edge(self, node)
       end
 
+      def remove_children(args = {})
+        children(args).each { |child| remove_edge(self, child) }
+      end
+
       def parents(args = {})
         parent_type = args[:parent_type] || self.class.name
         parent_edges.where(dag_parent_type: parent_type).map{ |e| e.dag_parent }
@@ -136,6 +140,9 @@
     def remove_edge(parent, child)
       edge = Edge.find_by(dag_parent: parent, dag_child: child)
       return edge unless edge
+      # --- destroy edge
+      edge.destroy
+      # --- 
       common_routes = parent.routes.ids & child.routes.ids
       common_routes.each do |route_id|
         nodes = RouteNode.where(route_id: route_id).nodes
@@ -157,8 +164,6 @@
             route.route_nodes.create(node: node, level: index)
           end
         end
-        # --- destroy edge
-        edge.destroy
       end
     end
 
