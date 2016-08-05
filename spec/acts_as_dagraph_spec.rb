@@ -49,6 +49,11 @@ RSpec.describe "ActsAsDagraph" do
       expect { unit.add_child(unit) }.to raise_error(SelfCyclicError)
     end
 
+    it "raises exception if duplication edge" do
+      unit.add_child(another_unit)
+      expect{ unit.add_child(another_unit) }.to raise_error(DuplicationError)
+    end
+
     it "raises exception if add ancestor node" do
       [
         [11, [7, 5]],
@@ -100,6 +105,9 @@ RSpec.describe "ActsAsDagraph" do
         end
       end
     end
+
+    context "weights" do
+    end
   end
 
   describe "#add_parent" do
@@ -108,6 +116,11 @@ RSpec.describe "ActsAsDagraph" do
 
     it "raises exception if add self node" do
       expect { unit.add_parent(unit) }.to raise_error(SelfCyclicError)
+    end
+
+    it "raises exception if duplication edge" do
+      unit.add_parent(another_unit)
+      expect{ unit.add_parent(another_unit) }.to raise_error(DuplicationError)
     end
 
     it "raises exception if add descendant node" do

@@ -11,15 +11,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160727082729) do
+ActiveRecord::Schema.define(version: 20160805115023) do
 
   create_table "dagraph_edges", force: :cascade do |t|
     t.integer  "dag_parent_id"
     t.string   "dag_parent_type"
     t.integer  "dag_child_id"
     t.string   "dag_child_type"
-    t.integer  "weight_id"
-    t.string   "weight_type"
+    t.integer  "weight"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
   end

@@ -34,16 +34,16 @@
         create_edge(node, self)
       end
 
+      def add_child(node)
+        create_edge(self, node)
+      end
+
       def remove_parent(node)
         remove_edge(node, self)
       end
 
       def remove_parents(args = {})
         parents(args).each { |parent| remove_edge(parent, self) }
-      end
-
-      def add_child(node)
-        create_edge(self, node)
       end
 
       def remove_child(node)
@@ -128,6 +128,7 @@
 
     def create_edge(parent, child)
       raise SelfCyclicError if parent == child
+      raise DuplicationError if Edge.find_by(dag_parent: parent, dag_child: child)
       raise CyclicError if parent.ancestors.flatten.uniq.include? child
 
       if parent.isolated? && child.isolated?
