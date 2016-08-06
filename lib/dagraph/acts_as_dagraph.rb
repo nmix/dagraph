@@ -1,4 +1,4 @@
- module Dagraph
+module Dagraph
   module ActsAsDagraph
     extend ActiveSupport::Concern
 
@@ -6,10 +6,10 @@
     end
 
     module ClassMethods 
-      def acts_as_dagraph(options = {}) 
+      def acts_as_dagraph
         include Dagraph::Model
 
-        def roots(args = {})
+        def roots
           parent_edges = Edge.find_by_sql("
             SELECT DISTINCT id 
             FROM dagraph_edges 
@@ -17,7 +17,7 @@
           Edge.where(id: parent_edges).parents.uniq
         end
 
-        def leafs(args = {})
+        def leafs
           child_edges = Edge.find_by_sql("
             SELECT DISTINCT id
             FROM dagraph_edges
@@ -70,7 +70,7 @@
 
       def children(args = {})
         child_type = args[:child_type] || self.class.name
-        nodes = child_edges.where(dag_child_type: child_type).map{ |e| args[:with_weight] ? [e.dag_child, e.weight] : e.dag_child }
+        child_edges.where(dag_child_type: child_type).map{ |e| args[:with_weight] ? [e.dag_child, e.weight] : e.dag_child }
       end
 
       def children_weights(args = {})
@@ -239,7 +239,6 @@
         end
       end
     end
-
   end
 end
 ActiveRecord::Base.include(Dagraph::ActsAsDagraph)
