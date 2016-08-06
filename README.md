@@ -2,24 +2,25 @@
 
 #### Dagraph provides DAG functionality to ActiveRecord models
 ![Example](https://upload.wikimedia.org/wikipedia/commons/0/08/Directed_acyclic_graph.png)
+
 [DAG description](https://en.wikipedia.org/wiki/Directed_acyclic_graph)
 [RU](https://ru.wikipedia.org/wiki/Направленный_ациклический_граф)
 
 ## Installation
-1. Gemfile
+1) Gemfile
 ```ruby
 gem 'dagraph', github: 'nmix/dagraph'
 ```
-2. Install gem
+2) Install gem
 ```bash
 bundle install
 ```
-3. Generate migration and run migrate
+3) Generate migration and run migrate
 ```bash
 bin/rails generate dagraph:migration
 bin/rake db:migrate
 ```
-4. Add `acs_as_dagraph` to model
+4) Add `acs_as_dagraph` to model
 ```ruby
 class Unit < ActiveRecord::Base
 	acts_as_dagraph
