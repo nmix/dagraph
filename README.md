@@ -1,7 +1,13 @@
 # Directed Acyclic Graph
 
 #### Dagraph provides DAG functionality to ActiveRecord models
+[![Code Climate](https://codeclimate.com/github/nmix/dagraph/badges/gpa.svg)](https://codeclimate.com/github/nmix/dagraph) 
+[![Test Coverage](https://codeclimate.com/github/nmix/dagraph/badges/coverage.svg)](https://codeclimate.com/github/nmix/dagraph/coverage) 
+[![Issue Count](https://codeclimate.com/github/nmix/dagraph/badges/issue_count.svg)](https://codeclimate.com/github/nmix/dagraph)
+
+
 ![Example](https://upload.wikimedia.org/wikipedia/commons/0/08/Directed_acyclic_graph.png)
+
 
 [DAG description](https://en.wikipedia.org/wiki/Directed_acyclic_graph)
 [RU](https://ru.wikipedia.org/wiki/Направленный_ациклический_граф)
