@@ -40,28 +40,42 @@
 
       def remove_parent(node)
         remove_edge(node, self)
+        parents
       end
 
       def remove_parents(args = {})
         parents(args).each { |parent| remove_edge(parent, self) }
+        parents
       end
 
       def remove_child(node)
         remove_edge(self, node)
+        children
       end
 
       def remove_children(args = {})
         children(args).each { |child| remove_edge(self, child) }
+        children
       end
 
       def parents(args = {})
         parent_type = args[:parent_type] || self.class.name
-        parent_edges.where(dag_parent_type: parent_type).map{ |e| e.dag_parent }
+        parent_edges.where(dag_parent_type: parent_type).map{ |e| args[:with_weight] ? [e.dag_parent, e.weight] : e.dag_parent }
+      end
+
+      def parents_weights(args = {})
+        args[:with_weight] = 1
+        parents(args)
       end
 
       def children(args = {})
         child_type = args[:child_type] || self.class.name
-        child_edges.where(dag_child_type: child_type).map{ |e| e.dag_child }
+        nodes = child_edges.where(dag_child_type: child_type).map{ |e| args[:with_weight] ? [e.dag_child, e.weight] : e.dag_child }
+      end
+
+      def children_weights(args = {})
+        args[:with_weight] = 1
+        children(args)
       end
 
       def routing
@@ -104,6 +118,16 @@
         ancestors(args).map{ |item| item + [self] }
       end
 
+      def ancestors_edges(args = {})
+        self_and_ancestors(args).map{ |nodes| Edge.weights(nodes) } 
+        # => [[edge, edge, ...], [edge, edge, ...], ...]
+      end
+
+      def ancestors_weights(args = {})
+        ancestors_edges(args).map{ |route| route.map{|edge| [edge.dag_parent, edge.weight] } } 
+        # =>  [ [ [node, weight], [node, weight], ... ], [ ... ], ... ]
+      end
+
       def descendants(args = {})
         descendant_type = args[:descendant_type] || self.class.name
         desc = route_nodes.map do |route_node|
@@ -126,7 +150,7 @@
         # =>  [ [ [node, weight], [node, weight], ... ], [ ... ], ... ]
       end
 
-      def descendants_comprised(args = {})
+      def descendants_assembled(args = {})
         # --- descendants edges with calculated weights
         dec = descendants_edges(args).map {|route| route.inject([]){|acc, edge| acc << [edge, acc.last ? acc.last[1]*edge.weight : edge.weight] } } 
         # => [ [[edge, weight], [edge, weight], ...], [...]]
@@ -136,7 +160,7 @@
         # => [ [unit, weight], [unit, weight], ...]]
         # ---
         # --- descendant uniq units with calculated (including non-uniq) weights
-        de_uniq.inject({}){|acc, uw| acc.has_key?(uw[0]) ? acc[uw[0]] += uw[1] : acc[uw[0]] = uw[1] ; acc }
+        de_uniq.inject({}){|acc, uw| acc.has_key?(uw[0]) ? acc[uw[0]] += uw[1] : acc[uw[0]] = uw[1] ; acc }.to_a
         # => [ [unit, weight], [unit, weight], ...]]
       end
 

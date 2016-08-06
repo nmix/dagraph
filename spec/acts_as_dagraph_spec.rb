@@ -302,12 +302,38 @@ RSpec.describe "ActsAsDagraph" do
         expect(node(code).parents.count).to eq count
       end
     end
+
+    it "gets parent nodes with weights" do
+      [
+        [2, [[11, 9]]],
+        [9, [[11,2], [8,1]]],
+        [10, [[11,1],[3,7]]],
+        [11, [[7,4],[5,6]]],
+        [8, [[7,1], [3,5]]]
+      ].each do |code, parent_codes|
+        parent_nodes = parent_codes.map{ |pcode, weight| [node(pcode), weight]}
+        expect(node(code).parents_weights).to contain_exactly(*parent_nodes)
+      end
+    end
   end
 
   describe "#children" do 
     it "determines the amount of all children for graph nodes" do
       [[7,2], [5,1], [3,2], [11,3], [8,1], [2,0], [9,0], [10,0]].each do |code, count|
         expect(node(code).children.count).to eq count
+      end
+    end
+
+    it "gets child nodes with weights" do
+      [
+        [7, [[11,4], [8,1]]],
+        [5, [[11, 6]]],
+        [3, [[8,5], [10,7]]],
+        [11, [[2,9], [9,2], [10,1]]],
+        [8, [[9,1]]]
+      ].each do |code, child_codes|
+        child_nodes = child_codes.map{ |ccode, weight| [node(ccode), weight]}
+        expect(node(code).children_weights).to contain_exactly(*child_nodes)
       end
     end
   end
@@ -529,7 +555,7 @@ RSpec.describe "ActsAsDagraph" do
     end
   end
 
-  describe "#descendants_comprised" do
+  describe "#descendants_assembled" do
     it "contains flatten descendants with comprised weights" do
       [
         [7, [[11, 4], [8,1], [2,36], [9,9], [10,4]]],
@@ -541,7 +567,21 @@ RSpec.describe "ActsAsDagraph" do
         [10, []]
       ].each do |code, descs|
         units_weights = descs.map{ |dcode, sum_weight| [node(dcode), sum_weight] }
-        expect(node(code).descendants_comprised).to contain_exactly(*units_weights)
+        expect(node(code).descendants_assembled).to contain_exactly(*units_weights)
+      end
+    end
+  end
+
+  describe "#ancestors_weights" do
+    it "contains ancestor units and their weights" do
+      [
+        [2, [[[7,4],[11,9]], [[5,6],[11,9]]] ],
+        [9, [[[7,4],[11,2]], [[5,6],[11,2]], [[7,1],[8,1]], [[3,5],[8,1]]] ],
+        [10, [[[7,4], [11,1]], [[5,6], [11,1]], [[3,7]]]],
+        [11, [[[7,4]], [[5,6]]]]
+      ].each do |code, ancs|
+        units_weights = ancs.map{ |anc_route| anc_route.map { |acode, weight| [node(acode), weight] } }
+        expect(node(code).ancestors_weights).to contain_exactly(*units_weights)
       end
     end
   end
