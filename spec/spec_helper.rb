@@ -1,3 +1,6 @@
+require "codeclimate-test-reporter"
+CodeClimate::TestReporter.start
+
 ENV['RAILS_ENV'] ||= 'test' 
 
 require File.expand_path("../test_app/config/environment.rb", __FILE__)
