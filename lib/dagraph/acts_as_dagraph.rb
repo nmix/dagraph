@@ -30,12 +30,12 @@
     end
 
     module LocalInstanceMethods
-      def add_parent(node) 
-        create_edge(node, self)
+      def add_parent(node, weight = 0) 
+        create_edge(node, self, weight)
       end
 
-      def add_child(node)
-        create_edge(self, node)
+      def add_child(node, weight = 0)
+        create_edge(self, node, weight)
       end
 
       def remove_parent(node)
@@ -116,6 +116,30 @@
         descendants(args).map{ |item| [self] + item }
       end
 
+      def descendants_edges(args = {})
+        self_and_descendants(args).map{ |nodes| Edge.weights(nodes) } 
+        # => [[edge, edge, ...], [edge, edge, ...], ...]
+      end
+
+      def descendants_weights(args = {})
+        descendants_edges(args).map{ |route| route.map{|edge| [edge.dag_child, edge.weight] } } 
+        # =>  [ [ [node, weight], [node, weight], ... ], [ ... ], ... ]
+      end
+
+      def descendants_comprised(args = {})
+        # --- descendants edges with calculated weights
+        dec = descendants_edges(args).map {|route| route.inject([]){|acc, edge| acc << [edge, acc.last ? acc.last[1]*edge.weight : edge.weight] } } 
+        # => [ [[edge, weight], [edge, weight], ...], [...]]
+        # ---
+        # --- descendant non-uniq units with calculated weight
+        de_uniq = dec.flatten.each_slice(2).to_a.uniq.map{|e,w| [e.dag_child, w]}
+        # => [ [unit, weight], [unit, weight], ...]]
+        # ---
+        # --- descendant uniq units with calculated (including non-uniq) weights
+        de_uniq.inject({}){|acc, uw| acc.has_key?(uw[0]) ? acc[uw[0]] += uw[1] : acc[uw[0]] = uw[1] ; acc }
+        # => [ [unit, weight], [unit, weight], ...]]
+      end
+
       def roots(args = {})
         ancestors(args).map{ |anc_route| anc_route.first }.uniq
       end
@@ -126,13 +150,13 @@
 
     end
 
-    def create_edge(parent, child)
+    def create_edge(parent, child, weight)
       raise SelfCyclicError if parent == child
       raise DuplicationError if Edge.find_by(dag_parent: parent, dag_child: child)
       raise CyclicError if parent.ancestors.flatten.uniq.include? child
-
+      # ---
       if parent.isolated? && child.isolated?
-        # create a simple route 
+        # --- create a simple route 
         route = Route.create
         route.route_nodes.create(node: parent, level: 0)
         route.route_nodes.create(node: child, level: 1)
@@ -159,7 +183,7 @@
           end
         end
       end
-      Edge.create(dag_parent: parent, dag_child: child)
+      Edge.create(dag_parent: parent, dag_child: child, weight: weight)
     end
 
     def remove_edge(parent, child)

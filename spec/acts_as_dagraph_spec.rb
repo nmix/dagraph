@@ -107,6 +107,11 @@ RSpec.describe "ActsAsDagraph" do
     end
 
     context "weights" do
+      it "sets the weight field" do
+        weight = Faker::Number.between(1, 10)
+        unit.add_child(another_unit, weight)
+        expect(Dagraph::Edge.weight(unit, another_unit)).to eq weight
+      end
     end
   end
 
@@ -171,6 +176,14 @@ RSpec.describe "ActsAsDagraph" do
             node(code).add_parent(create(:unit))
           }.to_not change{ Dagraph::Route.count }
         end
+      end
+    end
+
+    context "weights" do
+      it "sets the weight field" do
+        weight = Faker::Number.between(1, 10)
+        unit.add_parent(another_unit, weight)
+        expect(Dagraph::Edge.weight(another_unit, unit)).to eq weight
       end
     end
   end
@@ -492,6 +505,43 @@ RSpec.describe "ActsAsDagraph" do
     it "does not contain not bottom nodes" do
       nodes(7, 5, 3, 11, 8).each do |node|
         expect(Unit.leafs).not_to include(node)
+      end
+    end
+  end
+
+  describe "#descendants_weights" do
+    it "contains descendants units and their weights" do
+      [
+        [7, [[[11,4],[2,9]], [[11,4],[9,2]], [[11,4],[10,1]], [[8,1],[9,1]]] ],
+        [5, [[[11,6],[2,9]], [[11,6],[9,2]], [[11,6],[10,1]]] ],
+        [3, [[[8,5],[9,1]], [[10,7]]] ],
+        [11, [[[2,9]],[[9,2]],[[10,1]]] ],
+        [8, [[[9,1]]] ],
+        [2, [[[]]] ],
+        [9, [[[]]] ],
+        [10, [[[]]] ],
+      ].each do |code, descs|
+        # => unit_weights = [[[<Unit>, weight], [<Unit>, weight]], ... ]
+        units_weights = descs.map{ |desc_route| desc_route.map { |dcode, weight| [node(dcode), weight] } }
+        units_weights = [] if units_weights == [[[nil, nil]]]
+        expect(node(code).descendants_weights).to contain_exactly(*units_weights)
+      end
+    end
+  end
+
+  describe "#descendants_comprised" do
+    it "contains flatten descendants with comprised weights" do
+      [
+        [7, [[11, 4], [8,1], [2,36], [9,9], [10,4]]],
+        [5, [[11,6], [2,54], [9,12], [10,6]]],
+        [3, [[8,5], [9,5], [10,7]]],
+        [11, [[2, 9], [9,2], [10,1]]],
+        [2, []],
+        [9, []],
+        [10, []]
+      ].each do |code, descs|
+        units_weights = descs.map{ |dcode, sum_weight| [node(dcode), sum_weight] }
+        expect(node(code).descendants_comprised).to contain_exactly(*units_weights)
       end
     end
   end
