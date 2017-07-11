@@ -1,5 +1,5 @@
 
-class CreateDagraph < ActiveRecord::Migration 
+class CreateDagraph < ActiveRecord::Migration[5.0]
 
   def change 
     create_table :dagraph_edges do |t| 
