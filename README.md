@@ -8,14 +8,26 @@
 
 ![Example](https://upload.wikimedia.org/wikipedia/commons/0/08/Directed_acyclic_graph.png)
 
+## Description
 
-[DAG description](https://en.wikipedia.org/wiki/Directed_acyclic_graph)<br>
-[RU](https://ru.wikipedia.org/wiki/Направленный_ациклический_граф)
+[DAG (wiki)](https://en.wikipedia.org/wiki/Directed_acyclic_graph)<br>
+[Направленный ациклический граф (вики)](https://ru.wikipedia.org/wiki/Направленный_ациклический_граф)
+
+Gem compatibility:
+
+Gem version | Rails version
+---|---
+0.1.0 | Rails 4
+1.x | Rails 5
+
 
 ## Installation
 1) Gemfile
 ```ruby
+# for Rails 5
 gem 'dagraph', github: 'nmix/dagraph'
+# for Rails 4
+gem 'dagraph', github: 'nmix/dagraph', tag: '0.1.0'
 ```
 2) Install gem
 ```bash
