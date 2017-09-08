@@ -14,7 +14,7 @@ module Dagraph
             SELECT DISTINCT id 
             FROM dagraph_edges 
             WHERE dag_parent_id NOT IN (SELECT dag_child_id FROM dagraph_edges)")
-          Edge.where(id: parent_edges).parents.uniq
+          Edge.where(id: parent_edges).parents.uniq.compact
         end
 
         def leafs
@@ -22,7 +22,7 @@ module Dagraph
             SELECT DISTINCT id
             FROM dagraph_edges
             WHERE dag_child_id NOT IN (SELECT dag_parent_id FROM dagraph_edges)")
-          Edge.where(id: child_edges).children.uniq
+          Edge.where(id: child_edges).children.uniq.compact
         end
 
         def isolated
