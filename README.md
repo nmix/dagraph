@@ -221,8 +221,8 @@ method|description
 `unit.root?` | `true` if unit has no parents
 `unit.leaf?` | `true` if unit has no children
 `unit.isolated?` | `true` if node has no children no parents
-`Unit.roots`|Get array of units without children
-`Unit.leafs`|Get array of units without parents
+`Unit.roots`|Get array of units without parents
+`Unit.leafs`|Get array of units without children
 
 ## License
 This project rocks and uses MIT-LICENSE.
