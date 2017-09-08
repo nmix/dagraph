@@ -288,12 +288,6 @@ RSpec.describe "ActsAsDagraph" do
     it "creates isolated node" do
       expect(unit.isolated?).to be true
     end
-
-    it "is not isolated in graph" do
-      all_graph_nodes.each do |node|
-        expect(node.isolated?).to be false
-      end
-    end
   end
 
   describe "#parents" do
@@ -528,12 +522,19 @@ RSpec.describe "ActsAsDagraph" do
       expect(Unit.leafs).to include(*nodes(2, 9, 10))
     end
 
-    it "does not contain not bottom nodes" do
+    it "does not contain bottom nodes" do
       nodes(7, 5, 3, 11, 8).each do |node|
         expect(Unit.leafs).not_to include(node)
       end
     end
   end
+
+  describe ".isolated" do
+    it "doesnt contains parents and children" do
+      expect(Unit.isolated).to include(*nodes(15,20))
+    end
+  end
+
 
   describe "#descendants_weights" do
     it "contains descendants units and their weights" do

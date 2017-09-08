@@ -3,7 +3,7 @@ module ActsAsDagraphHelpers
 
   def create_graph(args = {})
     index = args[:index] || 0
-    [7, 5, 3, 11, 8, 2, 9, 10].map{ |label| create(:unit, name: "graph", code: index + label)}
+    [7, 5, 3, 11, 8, 2, 9, 10, 15, 20].map{ |label| create(:unit, name: "graph", code: index + label)}
     [
       [7, 11], [7, 8], [11, 9], [8, 9], [11, 10], 
       [5, 11], [11, 2], [3, 8], [3, 10]

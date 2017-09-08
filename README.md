@@ -53,7 +53,15 @@ end
 # create units
 unit7 = Unit.create(code: "7")
 unit5 = Unit.create(code: "5")
-unit3 = ...
+unit3 = Unit.create(code: "3")
+unit11 = Unit.create(code: "11")
+unit8 = Unit.create(code: "8")
+unit2 = Unit.create(code: "2")
+unit9 = Unit.create(code: "9")
+unit10 = Unit.create(code: "10")
+# isolated units
+unit15 = Unit.create(code: "15") 
+unit20 = Unit.create(code: "20")
 # create graph with weights
 unit7.add_child(unit11, 4)
 unit7.add_child(unit8, 1)
@@ -221,8 +229,10 @@ method|description
 `unit.root?` | `true` if unit has no parents
 `unit.leaf?` | `true` if unit has no children
 `unit.isolated?` | `true` if node has no children no parents
-`Unit.roots`|Get array of units without parents
-`Unit.leafs`|Get array of units without children
+`Unit.roots`|Get array of units without parents (except isolated)
+`Unit.leafs`|Get array of units without children (except isolated)
+`Unit.isolated`|Get array of isolated units
+`Unit.not_leafs` | Get array of root and isolated units
 
 ## License
 This project rocks and uses MIT-LICENSE.

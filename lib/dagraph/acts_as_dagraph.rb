@@ -25,6 +25,15 @@ module Dagraph
           Edge.where(id: child_edges).children.uniq
         end
 
+        def isolated
+          graph_ids = Dagraph::Edge.all.map{|e| [e.dag_parent_id, e.dag_child_id] }.flatten.uniq
+          Unit.where(id: ids - graph_ids).to_a
+        end
+
+        def not_leafs
+          roots + isolated
+        end
+
         include Dagraph::ActsAsDagraph::LocalInstanceMethods
       end
     end
